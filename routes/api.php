@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
   return $request->user();
 });
-Route::name('api.')->namespace('Api')->group(function () {
+Route::name('api.')->namespace('Api')->middleware('cors')->group(function () {
   Route::prefix('twitter')->name('twitter.')->group(function () {
     Route::get('/search-user/{screen_name}', 'TwitterController@searchUser')->name('search_user');
     Route::get('/followers/{screen_name}', 'TwitterController@followers')->name('followers');
