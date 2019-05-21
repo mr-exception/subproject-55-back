@@ -42,7 +42,7 @@ class TwitterController extends Controller {
       }
       return [
         'ok' => true,
-        'user' => $result,
+        'users' => $result,
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
@@ -69,7 +69,7 @@ class TwitterController extends Controller {
       }
       return [
         'ok' => true,
-        'user' => $result,
+        'users' => $result,
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
@@ -96,7 +96,7 @@ class TwitterController extends Controller {
       }
       return [
         'ok' => true,
-        'user' => $result,
+        'tweets' => $result,
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
@@ -120,7 +120,7 @@ class TwitterController extends Controller {
       $result = Twitter::getTweet($id, ['trim_user' => true, 'tweet_mode' => 'extended']);
       return [
         'ok' => true,
-        'user' => $result,
+        'tweet' => $result,
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
