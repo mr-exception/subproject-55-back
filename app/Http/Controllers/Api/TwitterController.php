@@ -38,8 +38,8 @@ class TwitterController extends Controller {
     try {
       $result = json_decode(Twitter::getFollowers(['screen_name' => $screen_name, 'count' => 200, 'format' => 'json', 'page' => $request->input('p', 1)]))->users;
       foreach ($result as $i => $record) {
-        unset($result[$i]['status']);
-        unset($result[$i]['entities']);
+        unset($result[$i]->status);
+        unset($result[$i]->entities);
       }
       return [
         'ok' => true,
@@ -66,8 +66,8 @@ class TwitterController extends Controller {
     try {
       $result = json_decode(Twitter::getFriends(['screen_name' => $screen_name, 'count' => 200, 'format' => 'json', 'page' => $request->input('p', 1)]))->users;
       foreach ($result as $i => $record) {
-        unset($result[$i]['status']);
-        unset($result[$i]['entities']);
+        unset($result[$i]->status);
+        unset($result[$i]->entities);
       }
       return [
         'ok' => true,
