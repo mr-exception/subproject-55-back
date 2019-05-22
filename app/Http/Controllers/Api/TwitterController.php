@@ -90,7 +90,7 @@ class TwitterController extends Controller {
   }
   public function tweets(Request $request, $screen_name) {
     try {
-      $result = json_decode(Twitter::getUserTimeline(['screen_name' => $screen_name, 'count' => 200, 'format' => 'json', 'page' => $request->input('p', 1)]));
+      $result = json_decode(Twitter::getUserTimeline(['screen_name' => $screen_name, 'tweet_mode' => 'extended', 'count' => 200, 'format' => 'json', 'page' => $request->input('p', 1)]));
       foreach($result as $i=>$record){
         unset($result[$i]->user);
         unset($result[$i]->entities);
