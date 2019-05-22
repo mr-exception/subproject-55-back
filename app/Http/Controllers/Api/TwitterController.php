@@ -91,9 +91,6 @@ class TwitterController extends Controller {
   public function tweets(Request $request, $screen_name) {
     try {
       $result = json_decode(Twitter::getUserTimeline(['screen_name' => $screen_name, 'count' => 200, 'format' => 'json', 'page' => $request->input('p', 1)]));
-      foreach ($result as $i => $record) {
-        $result[$i] = $record->id_str;
-      }
       return [
         'ok' => true,
         'tweets' => $result,
