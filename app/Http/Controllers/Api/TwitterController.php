@@ -95,9 +95,9 @@ class TwitterController extends Controller {
       $result = json_decode(Twitter::getUserTimeline(['screen_name' => $screen_name, 'tweet_mode' => 'extended', 'count' => 200, 'format' => 'json', 'page' => $request->input('p', 1)]));
       foreach($result as $i=>$record){
         unset($result[$i]->user);
-        unset($result[$i]->entities);
+        // unset($result[$i]->entities);
         unset($result[$i]->retweeted_status);
-        unset($result[$i]->extended_entities);
+        // unset($result[$i]->extended_entities);
       }
       return [
         'ok' => true,
