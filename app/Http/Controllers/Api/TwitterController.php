@@ -8,7 +8,7 @@ use RunTimeException;
 use Twitter;
 
 class TwitterController extends Controller {
-  public function searchUser(Request $request, $screen_name) {
+  public function user(Request $request, $screen_name) {
     try {
       $result = json_decode(Twitter::getUsers(['screen_name' => $screen_name, 'format' => 'json']));
       unset($result->entities);
@@ -29,7 +29,7 @@ class TwitterController extends Controller {
         return [
           'ok' => false,
           'code' => 0,
-          'message' => 'unknown error',
+          'message' => $e->getMessage(),
         ];
       }
     }
@@ -57,7 +57,7 @@ class TwitterController extends Controller {
         return [
           'ok' => false,
           'code' => 0,
-          'message' => 'unknown error',
+          'message' => $e->getMessage(),
         ];
       }
     }
@@ -85,7 +85,7 @@ class TwitterController extends Controller {
         return [
           'ok' => false,
           'code' => 0,
-          'message' => 'unknown error',
+          'message' => $e->getMessage(),
         ];
       }
     }
@@ -115,7 +115,7 @@ class TwitterController extends Controller {
         return [
           'ok' => false,
           'code' => 0,
-          'message' => 'unknown error',
+          'message' => $e->getMessage(),
         ];
       }
     }
@@ -139,7 +139,7 @@ class TwitterController extends Controller {
         return [
           'ok' => false,
           'code' => 0,
-          'message' => 'unknown error',
+          'message' => $e->getMessage(),
         ];
       }
     }
