@@ -11,8 +11,6 @@ class TwitterController extends Controller {
   public function user(Request $request, $screen_name) {
     try {
       $result = json_decode(Twitter::getUsers(['screen_name' => $screen_name, 'format' => 'json']));
-      unset($result->entities);
-      unset($result->status);
       return [
         'ok' => true,
         'user' => $result,
@@ -38,16 +36,14 @@ class TwitterController extends Controller {
     try {
       $filters = [
         'screen_name' => $screen_name,
-        'count' => $request->input('count', 200),
+        'count' => $request->input('pagesize', 200),
         'format' => 'json',
-        'cursor' => $request->input('cursor', -1),
+        'cursor' => $request->input('pagenumber', 1),
         'skip_status' => $request->input('skip_status', true),
         'include_user_entities' => $request->input('include_user_entities', false),
       ];
       $result = json_decode(Twitter::getFollowers($filters))->users;
       foreach ($result as $i => $record) {
-        unset($result[$i]->status);
-        unset($result[$i]->entities);
       }
       return [
         'ok' => true,
@@ -74,16 +70,14 @@ class TwitterController extends Controller {
     try {
       $filters = [
         'screen_name' => $screen_name,
-        'count' => $request->input('count', 200),
+        'count' => $request->input('pagesize', 200),
         'format' => 'json',
-        'cursor' => $request->input('cursor', -1),
+        'cursor' => $request->input('pagenumber', -1),
         'skip_status' => $request->input('skip_status', true),
         'include_user_entities' => $request->input('include_user_entities', false),
       ];
       $result = json_decode(Twitter::getFriends($filters))->users;
       foreach ($result as $i => $record) {
-        unset($result[$i]->status);
-        unset($result[$i]->entities);
       }
       return [
         'ok' => true,
@@ -111,9 +105,9 @@ class TwitterController extends Controller {
       $filters = [
         'screen_name' => $screen_name,
         'tweet_mode' => 'extended',
-        'count' => $request->input('count', 200),
+        'count' => $request->input('pagesize', 200),
         'format' => 'json',
-        'page' => $request->input('p', 1),
+        'page' => $request->input('pagenumber', 1),
       ];
       if ($request->has('offset') && $request->offset) {
         $filters['max_id'] = $request->offset;
@@ -121,10 +115,6 @@ class TwitterController extends Controller {
 
       $result = json_decode(Twitter::getUserTimeline($filters));
       foreach ($result as $i => $record) {
-        unset($result[$i]->user);
-        // unset($result[$i]->entities);
-        // unset($result[$i]->retweeted_status);
-        // unset($result[$i]->extended_entities);
       }
       return [
         'ok' => true,
@@ -152,19 +142,15 @@ class TwitterController extends Controller {
       $filters = [
         'screen_name' => $screen_name,
         'tweet_mode' => 'extended',
-        'count' => $request->input('count', 200),
+        'count' => $request->input('pagesize', 200),
         'format' => 'json',
-        'page' => $request->input('p', 1),
+        'page' => $request->input('pagenumber', 1),
       ];
       if ($request->has('offset') && $request->offset) {
         $filters['max_id'] = $request->offset;
       }
       $result = json_decode(Twitter::getMentionsTimeline($filters));
       foreach ($result as $i => $record) {
-        unset($result[$i]->user);
-        // unset($result[$i]->entities);
-        unset($result[$i]->retweeted_status);
-        // unset($result[$i]->extended_entities);
       }
       return [
         'ok' => true,
@@ -192,19 +178,15 @@ class TwitterController extends Controller {
       $filters = [
         'screen_name' => $screen_name,
         'tweet_mode' => 'extended',
-        'count' => $request->input('count', 200),
+        'count' => $request->input('pagesize', 200),
         'format' => 'json',
-        'page' => $request->input('p', 1),
+        'page' => $request->input('pagenumber', 1),
       ];
       if ($request->has('offset') && $request->offset) {
         $filters['max_id'] = $request->offset;
       }
       $result = json_decode(Twitter::getRtsTimeline($filters));
       foreach ($result as $i => $record) {
-        unset($result[$i]->user);
-        // unset($result[$i]->entities);
-        unset($result[$i]->retweeted_status);
-        // unset($result[$i]->extended_entities);
       }
       return [
         'ok' => true,
