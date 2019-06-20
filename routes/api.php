@@ -24,7 +24,7 @@ Route::name('api.')->namespace('Api')->middleware('cors')->group(function () {
     Route::get('/friends/{screen_name}', 'TwitterController@friends')->name('friends');
 
     Route::get('/tweets/{screen_name}', 'TwitterController@tweets')->name('tweets');
-    Route::get('/tweet/{id}', 'TwitterController@tweet')->name('tweet');
+    Route::get('/retweets/{screen_name}', 'TwitterController@retweets')->name('retweets');
 
     Route::get('/metions/{screen_name}', 'TwiiterController@metions')->name('mentions');
   });

@@ -123,7 +123,7 @@ class TwitterController extends Controller {
       foreach ($result as $i => $record) {
         unset($result[$i]->user);
         // unset($result[$i]->entities);
-        unset($result[$i]->retweeted_status);
+        // unset($result[$i]->retweeted_status);
         // unset($result[$i]->extended_entities);
       }
       return [
@@ -187,12 +187,28 @@ class TwitterController extends Controller {
       }
     }
   }
-  public function tweet(Request $request, $id) {
+  public function retweets(Request $request, $screen_name) {
     try {
-      $result = Twitter::getTweet($id, ['trim_user' => true, 'tweet_mode' => 'extended']);
+      $filters = [
+        'screen_name' => $screen_name,
+        'tweet_mode' => 'extended',
+        'count' => $request->input('count', 200),
+        'format' => 'json',
+        'page' => $request->input('p', 1),
+      ];
+      if ($request->has('offset') && $request->offset) {
+        $filters['max_id'] = $request->offset;
+      }
+      $result = json_decode(Twitter::getRtsTimeline($filters));
+      foreach ($result as $i => $record) {
+        unset($result[$i]->user);
+        // unset($result[$i]->entities);
+        unset($result[$i]->retweeted_status);
+        // unset($result[$i]->extended_entities);
+      }
       return [
         'ok' => true,
-        'tweet' => $result,
+        'tweets' => $result,
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
