@@ -5,4 +5,4 @@ Route::get('/', function () {
 });
 Route::get('/docs', function(){
   return view('document');
-});
+})->name('docs');
