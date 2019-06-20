@@ -17,6 +17,12 @@ class TwitterController extends Controller {
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
+      case '[63] User has been suspended.':
+        return [
+          'ok' => false,
+          'code' => 63,
+          'message' => 'user has been suspended',
+        ];
       case '[50] User not found.':
         return [
           'ok' => false,
@@ -51,6 +57,12 @@ class TwitterController extends Controller {
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
+      case '[63] User has been suspended.':
+        return [
+          'ok' => false,
+          'code' => 63,
+          'message' => 'user has been suspended',
+        ];
       case '[50] User not found.':
         return [
           'ok' => false,
@@ -85,6 +97,12 @@ class TwitterController extends Controller {
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
+      case '[63] User has been suspended.':
+        return [
+          'ok' => false,
+          'code' => 63,
+          'message' => 'user has been suspended',
+        ];
       case '[50] User not found.':
         return [
           'ok' => false,
@@ -122,6 +140,12 @@ class TwitterController extends Controller {
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
+      case '[63] User has been suspended.':
+        return [
+          'ok' => false,
+          'code' => 63,
+          'message' => 'user has been suspended',
+        ];
       case '[50] User not found.':
         return [
           'ok' => false,
@@ -158,6 +182,12 @@ class TwitterController extends Controller {
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
+      case '[63] User has been suspended.':
+        return [
+          'ok' => false,
+          'code' => 63,
+          'message' => 'user has been suspended',
+        ];
       case '[50] User not found.':
         return [
           'ok' => false,
@@ -194,6 +224,12 @@ class TwitterController extends Controller {
       ];
     } catch (RunTimeException $e) {
       switch ($e->getMessage()) {
+      case '[63] User has been suspended.':
+        return [
+          'ok' => false,
+          'code' => 63,
+          'message' => 'user has been suspended',
+        ];
       case '[50] User not found.':
         return [
           'ok' => false,
