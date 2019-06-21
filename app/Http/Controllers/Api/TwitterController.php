@@ -8,6 +8,35 @@ use RunTimeException;
 use Twitter;
 
 class TwitterController extends Controller {
+  private function handleErrors(RunTimeException $e) {
+    switch ($e->getMessage()) {
+    case '[63] User has been suspended.':
+      return [
+        'ok' => false,
+        'code' => 63,
+        'message' => 'user has been suspended',
+      ];
+    case '[88] Rate limit exceeded':
+      return [
+        'ok' => false,
+        'code' => 88,
+        'message' => 'rate limit exceeded',
+      ];
+    case '[50] User not found.':
+    case '[34] Sorry, that page does not exist.':
+      return [
+        'ok' => false,
+        'code' => 50,
+        'message' => 'user not found',
+      ];
+    default:
+      return [
+        'ok' => false,
+        'code' => 0,
+        'message' => $e->getMessage(),
+      ];
+    }
+  }
   public function user(Request $request, $screen_name) {
     try {
       $result = json_decode(Twitter::getUsers(['screen_name' => $screen_name, 'format' => 'json']));
@@ -16,106 +45,49 @@ class TwitterController extends Controller {
         'user' => $result,
       ];
     } catch (RunTimeException $e) {
-      switch ($e->getMessage()) {
-      case '[63] User has been suspended.':
-        return [
-          'ok' => false,
-          'code' => 63,
-          'message' => 'user has been suspended',
-        ];
-      case '[50] User not found.':
-        return [
-          'ok' => false,
-          'code' => 50,
-          'message' => 'user not found',
-        ];
-      default:
-        return [
-          'ok' => false,
-          'code' => 0,
-          'message' => $e->getMessage(),
-        ];
-      }
+      return $this->handleErrors($e);
     }
   }
   public function followers(Request $request, $screen_name) {
     try {
       $filters = [
         'screen_name' => $screen_name,
-        'count' => $request->input('pagesize', 200),
+        'count' => $request->input('count', 200),
         'format' => 'json',
-        'cursor' => $request->input('pagenumber', 1),
+        'cursor' => $request->input('offset', -1),
         'skip_status' => $request->input('skip_status', true),
         'include_user_entities' => $request->input('include_user_entities', false),
       ];
-      $result = json_decode(Twitter::getFollowers($filters))->users;
-      foreach ($result as $i => $record) {
-      }
+      $result = json_decode(Twitter::getFollowers($filters));
       return [
         'ok' => true,
-        'users' => $result,
+        'users' => $result->users,
+        'next_offset' => $result->next_cursor_str,
+        'prev_offset' => $result->previous_cursor_str,
       ];
     } catch (RunTimeException $e) {
-      switch ($e->getMessage()) {
-      case '[63] User has been suspended.':
-        return [
-          'ok' => false,
-          'code' => 63,
-          'message' => 'user has been suspended',
-        ];
-      case '[50] User not found.':
-        return [
-          'ok' => false,
-          'code' => 50,
-          'message' => 'user not found',
-        ];
-      default:
-        return [
-          'ok' => false,
-          'code' => 0,
-          'message' => $e->getMessage(),
-        ];
-      }
+      return $this->handleErrors($e);
     }
   }
   public function friends(Request $request, $screen_name) {
     try {
       $filters = [
         'screen_name' => $screen_name,
-        'count' => $request->input('pagesize', 200),
+        'count' => $request->input('count', 200),
         'format' => 'json',
-        'cursor' => $request->input('pagenumber', -1),
+        'cursor' => $request->input('offset', -1),
         'skip_status' => $request->input('skip_status', true),
         'include_user_entities' => $request->input('include_user_entities', false),
       ];
-      $result = json_decode(Twitter::getFriends($filters))->users;
-      foreach ($result as $i => $record) {
-      }
+      $result = json_decode(Twitter::getFriends($filters));
       return [
         'ok' => true,
-        'users' => $result,
+        'users' => $result->عسثقس,
+        'next_offset' => $result->next_cursor_str,
+        'prev_offset' => $result->previous_cursor_str,
       ];
     } catch (RunTimeException $e) {
-      switch ($e->getMessage()) {
-      case '[63] User has been suspended.':
-        return [
-          'ok' => false,
-          'code' => 63,
-          'message' => 'user has been suspended',
-        ];
-      case '[50] User not found.':
-        return [
-          'ok' => false,
-          'code' => 50,
-          'message' => 'user not found',
-        ];
-      default:
-        return [
-          'ok' => false,
-          'code' => 0,
-          'message' => $e->getMessage(),
-        ];
-      }
+      return $this->handleErrors($e);
     }
   }
   public function tweets(Request $request, $screen_name) {
@@ -123,42 +95,27 @@ class TwitterController extends Controller {
       $filters = [
         'screen_name' => $screen_name,
         'tweet_mode' => 'extended',
-        'count' => $request->input('pagesize', 200),
+        'count' => $request->input('count', 200),
         'format' => 'json',
-        'page' => $request->input('pagenumber', 1),
       ];
       if ($request->has('offset') && $request->offset) {
         $filters['max_id'] = $request->offset;
       }
-
       $result = json_decode(Twitter::getUserTimeline($filters));
-      foreach ($result as $i => $record) {
+      if ($request->has('offset') && $request->offset) {
+        array_shift($result);
       }
-      return [
+      $response = [
         'ok' => true,
         'tweets' => $result,
+        'offset' => null,
       ];
-    } catch (RunTimeException $e) {
-      switch ($e->getMessage()) {
-      case '[63] User has been suspended.':
-        return [
-          'ok' => false,
-          'code' => 63,
-          'message' => 'user has been suspended',
-        ];
-      case '[50] User not found.':
-        return [
-          'ok' => false,
-          'code' => 50,
-          'message' => 'user not found',
-        ];
-      default:
-        return [
-          'ok' => false,
-          'code' => 0,
-          'message' => $e->getMessage(),
-        ];
+      if (sizeof($result)) {
+        $response['offset'] = $result[sizeof($result) - 1]->id_str;
       }
+      return $response;
+    } catch (RunTimeException $e) {
+      return $this->handleErrors($e);
     }
   }
   public function mentions(Request $request, $screen_name) {
@@ -166,41 +123,27 @@ class TwitterController extends Controller {
       $filters = [
         'screen_name' => $screen_name,
         'tweet_mode' => 'extended',
-        'count' => $request->input('pagesize', 200),
+        'count' => $request->input('count', 200),
         'format' => 'json',
-        'page' => $request->input('pagenumber', 1),
       ];
       if ($request->has('offset') && $request->offset) {
         $filters['max_id'] = $request->offset;
       }
       $result = json_decode(Twitter::getMentionsTimeline($filters));
-      foreach ($result as $i => $record) {
+      if ($request->has('offset') && $request->offset) {
+        array_shift($result);
       }
-      return [
+      $response = [
         'ok' => true,
         'tweets' => $result,
+        'offset' => null,
       ];
-    } catch (RunTimeException $e) {
-      switch ($e->getMessage()) {
-      case '[63] User has been suspended.':
-        return [
-          'ok' => false,
-          'code' => 63,
-          'message' => 'user has been suspended',
-        ];
-      case '[50] User not found.':
-        return [
-          'ok' => false,
-          'code' => 50,
-          'message' => 'user not found',
-        ];
-      default:
-        return [
-          'ok' => false,
-          'code' => 0,
-          'message' => $e->getMessage(),
-        ];
+      if (sizeof($result)) {
+        $response['offset'] = $result[sizeof($result) - 1]->id_str;
       }
+      return $response;
+    } catch (RunTimeException $e) {
+      return $this->handleErrors($e);
     }
   }
   public function retweets(Request $request, $screen_name) {
@@ -208,41 +151,27 @@ class TwitterController extends Controller {
       $filters = [
         'screen_name' => $screen_name,
         'tweet_mode' => 'extended',
-        'count' => $request->input('pagesize', 200),
+        'count' => $request->input('count', 200),
         'format' => 'json',
-        'page' => $request->input('pagenumber', 1),
       ];
       if ($request->has('offset') && $request->offset) {
         $filters['max_id'] = $request->offset;
       }
       $result = json_decode(Twitter::getRtsTimeline($filters));
-      foreach ($result as $i => $record) {
+      if ($request->has('offset') && $request->offset) {
+        array_shift($result);
       }
-      return [
+      $response = [
         'ok' => true,
         'tweets' => $result,
+        'offset' => null,
       ];
-    } catch (RunTimeException $e) {
-      switch ($e->getMessage()) {
-      case '[63] User has been suspended.':
-        return [
-          'ok' => false,
-          'code' => 63,
-          'message' => 'user has been suspended',
-        ];
-      case '[50] User not found.':
-        return [
-          'ok' => false,
-          'code' => 50,
-          'message' => 'user not found',
-        ];
-      default:
-        return [
-          'ok' => false,
-          'code' => 0,
-          'message' => $e->getMessage(),
-        ];
+      if (sizeof($result)) {
+        $response['offset'] = $result[sizeof($result) - 1]->id_str;
       }
+      return $response;
+    } catch (RunTimeException $e) {
+      return $this->handleErrors($e);
     }
   }
 }

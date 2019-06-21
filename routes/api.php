@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::name('api.')->namespace('Api')->middleware('cors')->group(function () {
   Route::prefix('twitter')->name('twitter.')->group(function () {
-    Route::get('/user/{screen_name}', 'TwitterController@user')->name('search_user');
+    Route::get('/user/{screen_name}', 'TwitterController@user')->name('user');
 
     Route::get('/followers/{screen_name}', 'TwitterController@followers')->name('followers');
     Route::get('/friends/{screen_name}', 'TwitterController@friends')->name('friends');
