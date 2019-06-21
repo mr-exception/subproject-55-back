@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class TweetsTest extends TestCase {
+class MentionsTest extends TestCase {
   public function testSample() {
-    $response = $this->json('GET', '/api/twitter/tweets/BarackObama');
+    $response = $this->json('GET', '/api/twitter/mentions/BarackObama');
     $response->assertSuccessful();
     $response->assertJsonStructure([
       'ok', 'tweets' => [[
@@ -18,7 +18,7 @@ class TweetsTest extends TestCase {
     ]);
   }
   public function testNotFound() {
-    $response = $this->json('GET', '/api/twitter/tweets/bababab43535aba');
+    $response = $this->json('GET', '/api/twitter/mentions/bababab43535aba');
     $response->assertSuccessful();
     $response->assertJsonStructure([
       'ok', 'code', 'message',
@@ -29,7 +29,7 @@ class TweetsTest extends TestCase {
     ]);
   }
   public function testCount() {
-    $response = $this->json('GET', '/api/twitter/tweets/BarackObama', ['count' => 10]);
+    $response = $this->json('GET', '/api/twitter/mentions/BarackObama', ['count' => 10]);
     $response->assertSuccessful();
     $response->assertJsonStructure([
       'ok', 'tweets' => [],
@@ -37,13 +37,13 @@ class TweetsTest extends TestCase {
     $response->assertJsonCount(10, 'tweets');
   }
   public function testPageNumber() {
-    $response1 = $this->json('GET', '/api/twitter/tweets/BarackObama', ['count' => 10]);
+    $response1 = $this->json('GET', '/api/twitter/mentions/BarackObama', ['count' => 10]);
     $response1->assertSuccessful();
     $response1->assertJsonStructure([
       'ok', 'tweets' => [], 'offset',
     ]);
 
-    $response2 = $this->json('GET', '/api/twitter/tweets/BarackObama', ['count' => 10, 'offset' => $response1->original['offset']]);
+    $response2 = $this->json('GET', '/api/twitter/mentions/BarackObama', ['count' => 10, 'offset' => $response1->original['offset']]);
     $response1->assertJsonCount(10, 'tweets');
     $response2->assertSuccessful();
     $response2->assertJsonStructure([
@@ -53,10 +53,6 @@ class TweetsTest extends TestCase {
     $last_tweet_of_first_page = $response1->original['tweets'][sizeof($response1->original['tweets']) - 1];
     $first_tweet_of_second_page = $response2->original['tweets'][0];
     $this->assertNotEquals($last_tweet_of_first_page->id_str, $first_tweet_of_second_page->id_str);
-    // $response2 = $this->json('GET', '/api/twitter/tweets/BarackObama', ['pagesize' => 1, 'pagenumber' => 2]);
-    // $response2->assertJsonCount(1, 'tweets');
-
-    // $this->assertEquals($response1->original['tweets'][1]->id_str, $response2->original['tweets'][0]->id_str);
 
   }
 }
