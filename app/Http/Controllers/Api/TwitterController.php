@@ -82,7 +82,7 @@ class TwitterController extends Controller {
       $result = json_decode(Twitter::getFriends($filters));
       return [
         'ok' => true,
-        'users' => $result->عسثقس,
+        'users' => $result->users,
         'next_offset' => $result->next_cursor_str,
         'prev_offset' => $result->previous_cursor_str,
       ];
