@@ -4,19 +4,19 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration {
+class CreateFriendShipsTable extends Migration {
   /**
    * Run the migrations.
    *
    * @return void
    */
   public function up() {
-    Schema::create('users', function (Blueprint $table) {
+    Schema::create('friend_ships', function (Blueprint $table) {
       $table->bigIncrements('id');
-      $table->string('username');
-      $table->string('password');
-      $table->string('full_name');
-      $table->rememberToken();
+      $table->integer('src_id')->index();
+      $table->integer('dst_id')->index();
+      $table->string('src_id_str', 64)->index();
+      $table->string('dst_id_str', 64)->index();
       $table->timestamps();
     });
   }
@@ -27,6 +27,6 @@ class CreateUsersTable extends Migration {
    * @return void
    */
   public function down() {
-    Schema::dropIfExists('users');
+    Schema::dropIfExists('friend_ships');
   }
 }

@@ -4,19 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration {
+class CreateTasksTable extends Migration {
   /**
    * Run the migrations.
    *
    * @return void
    */
   public function up() {
-    Schema::create('users', function (Blueprint $table) {
+    Schema::create('tasks', function (Blueprint $table) {
       $table->bigIncrements('id');
-      $table->string('username');
-      $table->string('password');
-      $table->string('full_name');
-      $table->rememberToken();
+      $table->string('id_str', 64)->index();
+      $table->smallInteger('type')->index();
+      $table->smallInteger('status')->default(1)->index();
       $table->timestamps();
     });
   }
@@ -27,6 +26,6 @@ class CreateUsersTable extends Migration {
    * @return void
    */
   public function down() {
-    Schema::dropIfExists('users');
+    Schema::dropIfExists('tasks');
   }
 }
