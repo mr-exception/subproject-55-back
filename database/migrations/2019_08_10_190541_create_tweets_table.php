@@ -16,14 +16,14 @@ class CreateTweetsTable extends Migration {
       $table->string('id_str', 64);
       $table->string('text', 500);
 
-      $table->string('in_reply_to_status_id_str', 64);
-      $table->integer('usein_reply_to_status_id')->index();
+      $table->string('in_reply_to_status_id_str', 64)->default('NuLL');
+      $table->integer('in_reply_to_status_id')->index()->default(0);
 
-      $table->string('in_reply_to_user_id_str', 64);
-      $table->string('in_reply_to_screen_name', 64);
-      $table->integer('in_reply_to_user_id')->index();
+      $table->string('in_reply_to_user_id_str', 64)->default('NuLL');
+      $table->string('in_reply_to_screen_name', 64)->default('NuLL');
+      $table->integer('in_reply_to_user_id')->index()->default(0);
 
-      $table->integer('user_id')->index();
+      $table->integer('user_id')->index()->default(0);
       $table->string('user_id_str', 64);
 
       $table->integer('retweet_count');

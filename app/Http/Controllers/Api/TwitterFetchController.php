@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Drivers\Twitter;
 use App\Http\Controllers\Controller;
+use App\Models\FriendShip;
 use App\Models\Person;
 use App\Models\Task;
+use App\Models\Tweet;
 use Illuminate\Http\Request;
 
 class TwitterFetchController extends Controller {
@@ -13,6 +15,8 @@ class TwitterFetchController extends Controller {
     foreach (Task::HaveToRun()->limit(5)->get() as $task) {
       $this->fetchUser($task);
       $this->fetchTweets($task);
+      $task->status = Task::FINISHED;
+      $task->save();
     }
     echo "\ndone!";
   }
@@ -51,8 +55,6 @@ class TwitterFetchController extends Controller {
       ])->save();
       FriendShip::whereSrcIdStr($person->id_str)->update(['src_id' => $person->id]);
       FriendShip::whereDstIdStr($person->id_str)->update(['dst_id' => $person->id]);
-      $task->status = Task::FINISHED;
-      $task->save();
       echo "fetched user " . $user_id . "\n";
       // now we have to fetch all followers and task them
       $follower_ids = Twitter::fetchFollowersByUserId($user_id);
@@ -104,6 +106,45 @@ class TwitterFetchController extends Controller {
    */
   public function fetchTweets(Task $task) {
     $user_id = $task->id_str;
-    $result = Twitter::fetchTweetsByUserId($user_id);
+    $tweets = Twitter::fetchTweetsByUserId($user_id);
+    foreach ($tweets as $tweet) {
+      $obj = new Tweet;
+      $obj->id_str = $tweet->id_str;
+      $obj->text = $tweet->full_text;
+      $obj->retweet_count = $tweet->retweet_count;
+      $obj->favorite_count = $tweet->favorite_count;
+      $obj->lang = $tweet->lang;
+
+      $obj->user_id_str = $tweet->user->id_str;
+      $user = Person::where('id_str', $tweet->user->id_str)->first();
+      if ($user) {
+        $obj->user_id = $user->id;
+      } else {
+        $obj->user_id = 0;
+      }
+
+      if ($tweet->in_reply_to_screen_name) {
+        $obj->in_reply_to_screen_name = $tweet->in_reply_to_screen_name;
+        $obj->in_reply_to_user_id_str = $tweet->in_reply_to_user_id_str;
+        $user = Person::where('id_str', $tweet->in_reply_to_user_id_str)->first();
+        if ($user) {
+          $obj->in_reply_to_user_id = $user->id;
+        } else {
+          $obj->in_reply_to_user_id = 0;
+        }
+      }
+
+      if ($tweet->in_reply_to_status_id_str) {
+        $obj->in_reply_to_status_id_str = $tweet->in_reply_to_status_id_str;
+        $status = Tweet::where('id_str', $tweet->in_reply_to_status_id_str)->first();
+        if ($status) {
+          $obj->in_reply_to_status_id = $status->id;
+        } else {
+          $obj->in_reply_to_status_id = 0;
+        }
+      }
+      $obj->save();
+    }
+    echo "fetched " . sizeof($tweets) . " tweets\n";
   }
 }

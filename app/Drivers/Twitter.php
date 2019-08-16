@@ -32,8 +32,7 @@ class Twitter {
   public static function fetchTweetsByUserId(string $user_id) {
     try {
       $result = json_decode(TW::getUserTimeline(['user_id' => $user_id, 'format' => 'json', 'count' => 200, 'tweet_mode' => 'extended']));
-      dd($result);
-      return $result->ids;
+      return $result;
     } catch (RunTimeException $e) {
       return null;
     }
