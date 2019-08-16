@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>Sub Project 55</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -70,7 +70,7 @@
                     Subproject 55
                 </div>
                 <div class="links">
-                    <a href="route('docs')">Docs</a>
+                    <a href="{{route('docs')}}">Docs</a>
                     <a href="https://github.com/mr-exception/subproject-55-back">Github</a>
                     <a href="https://telegram.me/reza_ddr">Connect Me</a>
                 </div>
