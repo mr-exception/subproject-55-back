@@ -16,7 +16,15 @@ class General extends Controller {
     if ($person) {
       return view('show.person', ['person' => $person]);
     } else {
-      return redirect()->back()->with(['failed' => 'user not found!']);
+      return redirect()->route('web.home')->with(['failed' => 'user not found!']);
     }
+  }
+  public function followers(Request $request, Person $person) {
+    $persons = $person->followers()->paginate(10);
+    return view('followers', ['persons' => $persons, 'source' => $person]);
+  }
+  public function followings(Request $request, Person $person){
+    $persons = $person->followings()->paginate(10);
+    return view('followings', ['persons' => $persons, 'source' => $person]);
   }
 }

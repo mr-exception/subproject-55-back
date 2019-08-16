@@ -1,16 +1,3 @@
-
-<div class="row justify-content-center">
-  <div class="col-md-12 col-sm-12" style="text-align: center; margin-top: 25px;">
-    <form action="{{route('web.search')}}" method="GET">
-      <div class="input-group">
-        <input type="text" value="{{$person->screen_name}}" name="screen_name" class="form-control" placeholder="twitter username (eg: reza_binzar)">
-        <div class="input-group-append">
-          <button class="btn btn-outline-primary" type="submite">Search!</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
 <div class="row justify-content-center" style="margin-top: 15px;">
   <div class="col-md-12">
     <div class="card">
@@ -24,27 +11,33 @@
               <tbody>
                 <tr>
                   <th>user id</th>
-                  <td>{{$person->id_str}}</td>
+                  <td colspan="3">{{$person->id_str}}</td>
                 </tr>
                 <tr>
                   <th>username</th>
-                  <td>{{$person->screen_name}}</td>
+                  <td colspan="3">{{$person->screen_name}}</td>
                 </tr>
                 <tr>
                   <th>description</th>
-                  <td>{{$person->description}}</td>
+                  <td colspan="3">{{$person->description}}</td>
                 </tr>
                 <tr>
                   <th>followers</th>
-                  <td>{{$person->followers_count}} <a href="#">(see list)</a></td>
+                  <td colspan="3">{{$person->followers_count}} <a href="{{route('web.followers', ['person' => $person])}}">(see list)</a></td>
                 </tr>
                 <tr>
                   <th>followings</th>
-                  <td>{{$person->friends_count}} <a href="#">(see list)</a></td>
+                  <td colspan="3">{{$person->friends_count}} <a href="{{route('web.followings', ['person' => $person])}}">(see list)</a></td>
                 </tr>
                 <tr>
                   <th>tweets</th>
-                  <td>{{$person->tweets->count()}} <a href="#">(see list)</a></td>
+                  <td colspan="3">{{$person->tweets->count()}} <a href="{{route('web.tweets', ['person' => $person])}}">(see list)</a></td>
+                </tr>
+                <tr>
+                  <th>registered at</th>
+                  <td>{{$person->registered_at_str}}</td>
+                  <th>last update</th>
+                  <td>{{$person->modified_at_human_str}}</td>
                 </tr>
               </tbody>
             </table>

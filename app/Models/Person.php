@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Person extends Model {
@@ -22,13 +22,21 @@ class Person extends Model {
   public function getProfileImageUrlHttpsOriginalAttribute() {
     return str_replace('_normal', '', $this->profile_image_url_https);
   }
-  public function followers(){
+  public function followers() {
     return $this->belongsToMany(Person::class, 'friend_ships', 'dst_id', 'src_id');
   }
-  public function followings(){
+  public function followings() {
     return $this->belongsToMany(Person::class, 'friend_ships', 'src_id', 'dst_id');
   }
-  public function tweets(){
+  public function tweets() {
     return $this->hasMany(Tweet::class, 'user_id');
+  }
+  public function getRegisteredAtStrAttribute() {
+    $time = new Carbon($this->registered_at);
+    return $time->format('Y/m/d') . ' ('. $time->diffForHumans() .')';
+  }
+  public function getModifiedAtHumanStrAttribute() {
+    $time = new Carbon($this->updated_at);
+    return $time->diffForHumans();
   }
 }

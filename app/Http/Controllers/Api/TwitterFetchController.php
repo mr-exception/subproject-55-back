@@ -39,20 +39,20 @@ class TwitterFetchController extends Controller {
       $date = $result->created_at;
       $date_parts = explode(' ', $date);
       $person->fill([
-        'id_str' => $result->id_str ? $result->id_str : 'NuLL',
-        'screen_name' => $result->screen_name ? $result->screen_name : 'NuLL',
-        'location' => $result->location ? $result->location : 'NuLL',
-        'description' => $result->description ? $result->description : 'NuLL',
-        'followers_count' => $result->followers_count ? $result->followers_count : 0,
-        'friends_count' => $result->friends_count ? $result->friends_count : 0,
+        'id_str' => (property_exists($result, 'id_str') && $result->id_str) ? $result->id_str : 'NuLL',
+        'screen_name' => (property_exists($result, 'screen_name') && $result->screen_name) ? $result->screen_name : 'NuLL',
+        'location' => (property_exists($result, 'location') && $result->location) ? $result->location : 'NuLL',
+        'description' => (property_exists($result, 'description') && $result->description) ? $result->description : 'NuLL',
+        'followers_count' => (property_exists($result, 'followers_count') && $result->followers_count) ? $result->followers_count : 0,
+        'friends_count' => (property_exists($result, 'friends_count') && $result->friends_count) ? $result->friends_count : 0,
         'registered_at' => \DateTime::createFromFormat("d/M/Y/G:i:s", $date_parts[2] . '/' . $date_parts[1] . '/' . $date_parts[5] . '/' . $date_parts[3])->getTimestamp(),
-        'profile_background_color' => $result->profile_background_color ? $result->profile_background_color : 'NuLL',
-        'profile_background_image_url' => $result->profile_background_image_url ? $result->profile_background_image_url : 'NuLL',
-        'profile_background_image_url_https' => $result->profile_background_image_url_https ? $result->profile_background_image_url_https : 'NuLL',
-        'profile_background_tile' => $result->profile_background_tile ? $result->profile_background_tile : 'NuLL',
-        'profile_image_url_https' => $result->profile_image_url_https ? $result->profile_image_url_https : 'NuLL',
-        'profile_banner_url' => $result->profile_banner_url ? $result->profile_banner_url : 'NuLL',
-        'profile_link_color' => $result->profile_link_color ? $result->profile_link_color : 'NuLL',
+        'profile_background_color' => (property_exists($result, 'profile_background_color') && $result->profile_background_color) ? $result->profile_background_color : 'NuLL',
+        'profile_background_image_url' => (property_exists($result, 'profile_background_image_url') && $result->profile_background_image_url) ? $result->profile_background_image_url : 'NuLL',
+        'profile_background_image_url_https' => (property_exists($result, 'profile_background_image_url_https') && $result->profile_background_image_url_https) ? $result->profile_background_image_url_https : 'NuLL',
+        'profile_background_tile' => (property_exists($result, 'profile_background_tile') && $result->profile_background_tile) ? $result->profile_background_tile : 'NuLL',
+        'profile_image_url_https' => (property_exists($result, 'profile_image_url_https') && $result->profile_image_url_https) ? $result->profile_image_url_https : 'NuLL',
+        'profile_banner_url' => (property_exists($result, 'profile_banner_url') && $result->profile_banner_url) ? $result->profile_banner_url : 'NuLL',
+        'profile_link_color' => (property_exists($result, 'profile_link_color') && $result->profile_link_color) ? $result->profile_link_color : 'NuLL',
       ])->save();
       Person::updateLatestIds($person);
       echo "fetched user " . $user_id . "\n";
@@ -63,12 +63,24 @@ class TwitterFetchController extends Controller {
           $task = Task::whereIdStr($fid)->UserType()->first();
           if (!$task) {
             $task = Task::create(['id_str' => $fid, 'type' => Task::FETCH_USER]);
-            FriendShip::create([
+            if (!$task) {
+              $task = Task::create([
+                'id_str' => $fid,
+                'type' => Task::FETCH_USER,
+              ]);
+            }
+            $follower = FriendShip::where([
               'src_id_str' => $fid,
-              'src_id' => 0,
-              'dst_id_str' => $person->id_str,
               'dst_id' => $person->id,
-            ]);
+            ])->first();
+            if (!$follower) {
+              FriendShip::create([
+                'src_id_str' => $fid,
+                'src_id' => 0,
+                'dst_id_str' => $person->id_str,
+                'dst_id' => $person->id,
+              ]);
+            }
           }
         }
       }
@@ -83,13 +95,17 @@ class TwitterFetchController extends Controller {
               'id_str' => $fid,
               'type' => Task::FETCH_USER,
             ]);
-            FriendShip::create([
-              'dst_id_str' => $fid,
-              'dst_id' => 0,
-              'src_id_str' => $person->id_str,
-              'src_id' => $person->id,
-            ]);
           }
+          $following = FriendShip::where([
+            'dst_id_str' => $fid,
+            'src_id' => $person->id,
+          ])->first();
+          FriendShip::create([
+            'dst_id_str' => $fid,
+            'dst_id' => 0,
+            'src_id_str' => $person->id_str,
+            'src_id' => $person->id,
+          ]);
         }
       }
       echo "added " . sizeof($following_ids) . " users to task fetch from followings\n";
