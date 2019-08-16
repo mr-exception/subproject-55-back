@@ -15,4 +15,11 @@ class Tweet extends Model {
     'retweet_count', 'favorite_count',
     'lang',
   ];
+
+  public function hash_tags() {
+    return $this->belongsToMany(HashTag::class, 'tweet_hash_tags', 'tweet_id', 'hash_tag_id');
+  }
+  public static function updateLatestIds(Tweet $tweet) {
+    Tweet::where('in_reply_to_status_id_str', $tweet->id_str)->update(['in_reply_to_status_id' => $tweet->id]);
+  }
 }

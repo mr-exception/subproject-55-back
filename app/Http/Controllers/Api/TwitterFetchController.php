@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Drivers\Twitter;
 use App\Http\Controllers\Controller;
 use App\Models\FriendShip;
+use App\Models\HashTag;
 use App\Models\Person;
 use App\Models\Task;
 use App\Models\Tweet;
+use App\Models\TweetHashTag;
 use Illuminate\Http\Request;
 
 class TwitterFetchController extends Controller {
@@ -20,7 +22,6 @@ class TwitterFetchController extends Controller {
     }
     echo "\ndone!";
   }
-
   /**
    * fetches a user
    * this function does these steps:
@@ -53,8 +54,7 @@ class TwitterFetchController extends Controller {
         'profile_banner_url' => $result->profile_banner_url ? $result->profile_banner_url : 'NuLL',
         'profile_link_color' => $result->profile_link_color ? $result->profile_link_color : 'NuLL',
       ])->save();
-      FriendShip::whereSrcIdStr($person->id_str)->update(['src_id' => $person->id]);
-      FriendShip::whereDstIdStr($person->id_str)->update(['dst_id' => $person->id]);
+      Person::updateLatestIds($person);
       echo "fetched user " . $user_id . "\n";
       // now we have to fetch all followers and task them
       $follower_ids = Twitter::fetchFollowersByUserId($user_id);
@@ -144,6 +144,18 @@ class TwitterFetchController extends Controller {
         }
       }
       $obj->save();
+      Tweet::updateLatestIds($obj);
+      foreach ($tweet->entities->hashtags as $hashtag) {
+        $tag = HashTag::whereTitle($hashtag->text)->first();
+        if (!$tag) {
+          $tag = HashTag::create(['title' => $hashtag->text]);
+        }
+        TweetHashTag::create([
+          'tweet_id' => $obj->id,
+          'tweet_id_str' => $obj->id_str,
+          'hash_tag_id' => $tag->id,
+        ]);
+      }
     }
     echo "fetched " . sizeof($tweets) . " tweets\n";
   }
