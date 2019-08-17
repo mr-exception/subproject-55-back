@@ -173,7 +173,9 @@ class TwitterFetchController extends Controller {
     echo "fetched " . sizeof($tweets) . " tweets\n";
   }
   public function cleanTasks(Request $request) {
+    $count_grouped =  sizeof(Task::select('id_str')->GroupBy('id_str')->get());
     $count = Task::count();
+    return $count;
     $step = $request->input('step', 100);
     $tasks = Task::offset($request->input('offset', 0))->limit($step)->get();
     foreach ($tasks as $task) {
