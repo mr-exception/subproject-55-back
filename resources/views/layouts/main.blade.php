@@ -21,13 +21,13 @@
     @if(session('failed', false))
       <div role="alert" aria-live="assertive" aria-atomic="true" class="toast" data-autohide="false">
         <div class="toast-header">
-          <strong class="mr-auto"><i class="fa fa-bell-o" aria-hidden="true"></i></strong>
+          <strong class="mr-auto"><i class="fa fa-bell-o" aria-hidden="true"></i> <span>{{session('failed')['title']}}</span></strong>
           <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="toast-body">
-          {{session('failed')}}
+          {{session('failed')['message']}}
         </div>
       </div>
     @endif
