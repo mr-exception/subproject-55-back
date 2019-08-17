@@ -1,8 +1,12 @@
 {{-- tweets and likes and retweets per day --}}
-<div class="row">
-  <div class="col-md-12">
-    <div style="width:100%;">
-      <canvas id="tweets-retweets-likes"></canvas>
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-header">Tweets & Likes & Retweets</div>
+    <div class="card-body">
+      <p style="text-align: justify;">The amount of tweets, retweets, and likes during the day (in the last 2 tweets) is usually between celebrities, with retweets being between 2 and 3 times the number of tweets. For fake accounts and celebrity quotes, the likes are 2 to 5 times the number of tweets, and in ordinary accounts the likes are 2 to 5 times the tweets.</p>
+      <div style="width:100%;">
+        <canvas id="tweets-retweets-likes"></canvas>
+      </div>
     </div>
   </div>
 </div>
@@ -71,7 +75,7 @@
     options: {
       responsive: true,
       title: {
-        display: true,
+        display: false,
         text: 'Tweets & Likes & Retweets'
       },
       tooltips: {
