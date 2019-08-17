@@ -60,7 +60,7 @@ class TwitterFetchController extends Controller {
       $follower_ids = Twitter::fetchFollowersByUserId($user_id);
       if ($follower_ids) {
         foreach ($follower_ids as $fid) {
-          $task = Task::whereIdStr($fid)->UserType()->first();
+          $task = Task::whereIdStr($fid)->first();
           if (!$task) {
             $task = Task::create([
               'id_str' => $fid,
@@ -86,7 +86,7 @@ class TwitterFetchController extends Controller {
       $following_ids = Twitter::fetchFollowingsByUserId($user_id);
       if ($following_ids) {
         foreach ($following_ids as $fid) {
-          $task = Task::whereIdStr($fid)->UserType()->first();
+          $task = Task::whereIdStr($fid)->first();
           if (!$task) {
             $task = Task::create([
               'id_str' => $fid,
@@ -173,19 +173,14 @@ class TwitterFetchController extends Controller {
     echo "fetched " . sizeof($tweets) . " tweets\n";
   }
   public function cleanTasks(Request $request) {
-    $count_grouped =  sizeof(Task::select('id_str')->GroupBy('id_str')->get());
-    $count = Task::count();
-    return $count;
-    $step = $request->input('step', 100);
-    $tasks = Task::offset($request->input('offset', 0))->limit($step)->get();
-    foreach ($tasks as $task) {
-      $section = Task::whereIdStr($task->id_str)->get();
-      foreach ($section as $k => $sec) {
-        if ($k > 0) {
-          $sec->delete();
+    $duplicateds = \DB::select('SELECT id_str, count(*) as cc FROM `tasks` GROUP BY id_str HAVING cc > 1');
+    foreach ($duplicateds as $dub) {
+      foreach (Task::whereIdStr($dub->id_str)->get() as $i => $t) {
+        if ($i > 0) {
+          $t->delete();
         }
       }
     }
-    return $count;
+    return 'done!';
   }
 }
