@@ -62,25 +62,22 @@ class TwitterFetchController extends Controller {
         foreach ($follower_ids as $fid) {
           $task = Task::whereIdStr($fid)->UserType()->first();
           if (!$task) {
-            $task = Task::create(['id_str' => $fid, 'type' => Task::FETCH_USER]);
-            if (!$task) {
-              $task = Task::create([
-                'id_str' => $fid,
-                'type' => Task::FETCH_USER,
-              ]);
-            }
-            $follower = FriendShip::where([
+            $task = Task::create([
+              'id_str' => $fid,
+              'type' => Task::FETCH_USER,
+            ]);
+          }
+          $follower = FriendShip::where([
+            'src_id_str' => $fid,
+            'dst_id' => $person->id,
+          ])->first();
+          if (!$follower) {
+            FriendShip::create([
               'src_id_str' => $fid,
+              'src_id' => 0,
+              'dst_id_str' => $person->id_str,
               'dst_id' => $person->id,
-            ])->first();
-            if (!$follower) {
-              FriendShip::create([
-                'src_id_str' => $fid,
-                'src_id' => 0,
-                'dst_id_str' => $person->id_str,
-                'dst_id' => $person->id,
-              ]);
-            }
+            ]);
           }
         }
       }
@@ -174,5 +171,17 @@ class TwitterFetchController extends Controller {
       }
     }
     echo "fetched " . sizeof($tweets) . " tweets\n";
+  }
+  public function cleanTasks(Request $request) {
+    foreach (Task::all() as $task) {
+      $tasks = Task::whereIdStr($task->id_str)->get();
+      if (sizeof($tasks) > 1) {
+        foreach ($tasks as $i => $task) {
+          if ($i > 0) {
+            $task->delete();
+          }
+        }
+      }
+    }
   }
 }

@@ -20,11 +20,15 @@ class General extends Controller {
     }
   }
   public function followers(Request $request, Person $person) {
-    $persons = $person->followers()->paginate(10);
+    $persons = $person->followers()->paginate(20);
     return view('followers', ['persons' => $persons, 'source' => $person]);
   }
-  public function followings(Request $request, Person $person){
-    $persons = $person->followings()->paginate(10);
+  public function followings(Request $request, Person $person) {
+    $persons = $person->followings()->paginate(20);
     return view('followings', ['persons' => $persons, 'source' => $person]);
+  }
+  public function tweets(Request $request, Person $person) {
+    $tweets = $person->tweets()->paginate(20);
+    return view('tweets', ['tweets' => $tweets, 'source' => $person]);
   }
 }
