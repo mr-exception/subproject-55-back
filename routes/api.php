@@ -29,5 +29,6 @@ Route::name('api.')->namespace('Api')->middleware('cors')->group(function () {
     Route::get('/mentions/{screen_name}', 'TwitterController@mentions')->name('mentions');
 
     Route::get('/fetch', 'TwitterFetchController@run')->name('fetch');
+    Route::get('/clean', 'TwitterFetchController@cleanTasks')->name('clean');
   });
 });

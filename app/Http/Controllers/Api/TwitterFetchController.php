@@ -173,15 +173,17 @@ class TwitterFetchController extends Controller {
     echo "fetched " . sizeof($tweets) . " tweets\n";
   }
   public function cleanTasks(Request $request) {
-    foreach (Task::all() as $task) {
-      $tasks = Task::whereIdStr($task->id_str)->get();
-      if (sizeof($tasks) > 1) {
-        foreach ($tasks as $i => $task) {
-          if ($i > 0) {
-            $task->delete();
-          }
+    $count = Task::count();
+    $step = $request->input('step', 100);
+    $tasks = Task::offset($request->input('offset', 0))->limit($step)->get();
+    foreach ($tasks as $task) {
+      $section = Task::whereIdStr($task->id_str)->get();
+      foreach ($section as $k => $sec) {
+        if ($k > 0) {
+          $sec->delete();
         }
       }
     }
+    return $count;
   }
 }
