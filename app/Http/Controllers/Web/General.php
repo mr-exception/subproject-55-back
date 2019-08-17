@@ -14,23 +14,32 @@ class General extends Controller {
   }
   public function search(Request $request) {
     $screen_name = $request->input('screen_name', '');
-    // try {
-      $person = Twitter::fetchUserByScreenName($screen_name);
-      return $person;
-      $followers = Twitter::fetchFollowersByScreenName($screen_name);
-      $followings = Twitter::fetchFollowingsByScreenName($screen_name);
-      $tweets = Twitter::fetchTweetsByScreenName($screen_name);
+    try {
+      if (time() - session("fetched_users.$screen_name.last_fetch", 0) > 3600 * 4) {
+        $person = Twitter::fetchUserByScreenName($screen_name);
+        $followers = Twitter::fetchFollowersByScreenName($screen_name);
+        $followings = Twitter::fetchFollowingsByScreenName($screen_name);
+        $tweets = Twitter::fetchTweetsByScreenName($screen_name);
+        $last_fetch = time();
 
-      $fetched_users = $request->session()->get('fetched_users', []);
-      $fetched_users[$screen_name] = compact($person, $followers, $followings, $tweets);
-
-      return view('show.person', ['person' => $person]);
-    // } catch (RunTimeException $e) {
+        $fetched_users = $request->session()->get('fetched_users', []);
+        $fetched_users[$screen_name] = [
+          'person' => $person,
+          'followers' => $followers,
+          'followings' => $followings,
+          'tweets' => $tweets,
+          'last_fetch' => $last_fetch,
+        ];
+        $request->session()->put('fetched_users', $fetched_users);
+      }
+      // return dd(session("fetched_users.$screen_name.tweets.0"));
+      return view('show.person', ['screen_name' => $screen_name]);
+    } catch (RunTimeException $e) {
       return redirect()->route('web.home')->with(['failed' => [
         'title' => 'sorry! user not found',
         'message' => 'maybe the entered username is wrong or there is a problem in your connection. make sure that user has not changed username',
       ]]);
-    // }
+    }
   }
   public function followers(Request $request, Person $person) {
     $persons = $person->followers()->paginate(20);

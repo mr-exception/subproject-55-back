@@ -1,6 +1,7 @@
 @extends('layouts.main')
-@section('title', $person->screen_name)
+@section('title', $screen_name)
 @section('content')
-@include('components.search', ['person' => $person])
-@include('components.person_info')
+  @include('components.search')
+  @include('components.person_info')
+  @include('components.charts.TRL')
 @endsection
