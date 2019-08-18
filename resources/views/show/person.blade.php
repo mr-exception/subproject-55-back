@@ -11,5 +11,6 @@
     @include('components.person_info')
     @include('components.charts.TRL')
     @include('components.charts.MRU')
+    @include('components.charts.MFH')
   </div>
 @endsection
