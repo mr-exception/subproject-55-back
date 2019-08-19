@@ -8,8 +8,8 @@ class Subject extends Model {
   protected $primary = 'id';
   protected $table = 'subjects';
   protected $fillable = ['title', 'documents_count'];
-
-  public function tokens() {
-    return $this->hasMany(Token::class, 'subject_id');
+  
+  public function documents() {
+    return $this->hasMany(Document::class, 'subject_id');
   }
 }
