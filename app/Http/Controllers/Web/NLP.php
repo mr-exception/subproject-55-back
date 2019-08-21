@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Drivers\NLP as NLPDriver;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
-use App\Models\Subject;
 use Illuminate\Http\Request;
-use NlpTools\Classifiers\MultinomialNBClassifier;
 use NlpTools\Documents\TokensDocument;
 use NlpTools\Documents\TrainingSet;
 use NlpTools\FeatureFactories\DataAsFeatures;
@@ -31,17 +30,11 @@ class Nlp extends Controller {
         'text' => $request->input('text', ''),
       ]);
     }
-    return redirect()->route('web.learn', ['screen_name' => $request->screen_name, 'step' => $request->step + 1]);
-  }
-  public function test(Request $request) {
-    $screen_name = $request->input('screen_name');
-    $tweets = session("fetched_users.$screen_name.tweets");
 
     $tset = new TrainingSet();
     $tok = new WhitespaceTokenizer();
     $ff = new DataAsFeatures();
 
-    // ---------- Training ----------------
     foreach (Document::all() as $document) {
       $tset->addDocument(
         $document->subject_id,
@@ -52,24 +45,15 @@ class Nlp extends Controller {
     }
     $model = new FeatureBasedNB();
     $model->train($ff, $tset);
-    // ---------- Classification ----------------
-    $cls = new MultinomialNBClassifier($ff, $model);
-    $results = [];
+    $serialized = serialize($model);
+    file_put_contents('./model.db', $serialized);
 
-    foreach ($tweets as $tweet) {
-      $result = [];
-      foreach (Subject::all() as $subject) {
-        $prediction = $cls->getScore($subject->id, new TokensDocument($tok->tokenize($tweet->full_text)));
-        $result[$subject->id] = $prediction;
-      }
-      asort($result, SORT_NUMERIC);
-      foreach ($result as $key => $value) {
-        if (sizeof($result) > 5) {
-          unset($result[$key]);
-        }
-      }
-      array_push($results, $result);
-    }
-    dd($results);
+    return redirect()->route('web.learn', ['screen_name' => $request->screen_name, 'step' => $request->step + 1]);
+  }
+  public function test(Request $request) {
+    $screen_name = $request->input('screen_name');
+    $tweets = session("fetched_users.$screen_name.tweets");
+    $scores = NLPDriver::getScores($tweets[0]->full_text);
+    return $scores;
   }
 }

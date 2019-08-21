@@ -9,7 +9,7 @@ class DatabaseSeeder extends Seeder {
    * @return void
    */
   public function run() {
-    $this->call(TaskSeeder::class);
+    // $this->call(TaskSeeder::class);
     $this->call(SubjectSeeder::class);
   }
 }

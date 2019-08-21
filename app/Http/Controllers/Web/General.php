@@ -49,8 +49,16 @@ class General extends Controller {
     $persons = $person->followings()->paginate(20);
     return view('followings', ['persons' => $persons, 'source' => $person]);
   }
-  public function tweets(Request $request, Person $person) {
-    $tweets = $person->tweets()->paginate(20);
-    return view('tweets', ['tweets' => $tweets, 'source' => $person]);
+  public function tweets(Request $request, $screen_name) {
+    $tweets = session("fetched_users.$screen_name.tweets", null);
+    $person = session("fetched_users.$screen_name.person", null);
+    if ($tweets) {
+      $total = ceil(sizeof($tweets)/10);
+      $tweets = array_splice($tweets, $request->input('page', 0) * 10, 10);
+      return view('tweets', ['tweets' => $tweets, 'person' => $person, 'page' => $request->input('page', 0), 'total' => $total]);
+    } else {
+      return redirect()->route('web.search', ['screen_name' => $screen_name]);
+    }
+
   }
 }

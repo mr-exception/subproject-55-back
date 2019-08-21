@@ -33,6 +33,10 @@
                 <th>registered at</th>
                 <td>{{session("fetched_users.$screen_name.person")->created_at}}</td>
               </tr>
+              <tr>
+                <th>tweets</th>
+                <td><a href="{{route('web.tweets', ['screen_name' => $screen_name])}}">show</a></td>
+              </tr>
             </tbody>
           </table>
         </div>
