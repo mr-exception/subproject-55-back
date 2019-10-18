@@ -12,18 +12,6 @@
               {{$tweet->full_text}}
             </div>
           @endif
-          @php
-            use \App\Drivers\NLP;
-            $classes = NLP::getScores($tweet->full_text);
-          @endphp
-          <div class="col-md-12">
-            @foreach($classes as $cls=>$score)
-              @php
-                $subject = \App\Models\Subject::whereId($cls)->first();
-              @endphp
-              <span class="badge badge-secondary">{{$subject->title}}</span>
-            @endforeach
-          </div>
         </div>
       </div>
     </div>
