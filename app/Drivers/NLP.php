@@ -22,12 +22,12 @@ class NLP {
       $prediction = $cls->getScore($subject->id, new TokensDocument($tok->tokenize($text)));
       $result[$subject->id] = $prediction;
     }
-    asort($result, SORT_NUMERIC);
-    foreach ($result as $key => $value) {
-      if (sizeof($result) > 5) {
-        unset($result[$key]);
-      }
-    }
+    // asort($result, SORT_NUMERIC);
+    // foreach ($result as $key => $value) {
+    //   if (sizeof($result) > 5) {
+    //     unset($result[$key]);
+    //   }
+    // }
     return $result;
   }
   public static function generateModel() {

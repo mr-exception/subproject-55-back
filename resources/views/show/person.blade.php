@@ -12,6 +12,7 @@
     @include('components.charts.TRL')
     @include('components.charts.MRU')
     @include('components.charts.MFH')
+    @include('components.charts.MMS')
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
